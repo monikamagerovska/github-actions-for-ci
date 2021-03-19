@@ -10,7 +10,10 @@ Conversation
  
 Owner
 monikamagerovska commented 8 minutes ago
-No description provided.
+      - uses: actions/upload-artifact@master
+        with:
+          name: webpack artifacts
+          path: public/
 
 @monikamagerovska
 Update node.js.yml
