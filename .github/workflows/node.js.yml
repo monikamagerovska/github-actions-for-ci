@@ -1,17 +1,60 @@
-# This workflow will do a clean install of node dependencies, build the source code and run tests across different versions of node
-# For more information see: https://help.github.com/actions/language-and-framework-guides/using-nodejs-with-github-actions
+Open
+Improve CI
+#5
+monikamagerovska wants to merge 3 commits into main from monikamagerovska-patch-2
+Conversation 3
+Commits 3
+Checks 5
+Files changed 1
+Conversation
+ 
+Owner
+monikamagerovska commented 8 minutes ago
+No description provided.
 
-name: Node.js CI
+@monikamagerovska
+Update node.js.yml
+0dff79d
+@github-learning-lab github-learning-lab bot commented 8 minutes ago
+Matrix builds
+Great work so far! By targeting specific versions of Node, we've configured a build matrix which allow us to test across multiple operating systems, platforms, and language versions. See Configuring a matrix build in GitHub Help if you'd like to learn more.
 
-on:
-  push:
-    branches: [ main ]
-  pull_request:
-    branches: [ main ]
+I'll respond when you commit the changes in the comment below.
 
+github-learning-lab bot reviewed 8 minutes ago
+.github/workflows/node.js.yml
+@monikamagerovska
+@github-learning-lab
+Update .github/workflows/node.js.yml …
+1c75d86
+@github-learning-lab github-learning-lab bot commented 6 minutes ago
+New Job
+Great, if you look at the logs now, you'll notice that multiple builds will exist: 4 build to be exact! That's because for each of the 2 operating systems we're running tests against 2 versions so: 2 OS ✖️ 2 Node.js versions = 4 builds.
+
+Our custom workflow now accounts for:
+
+✅ test against multiple targets so that we know if our supported operating systems and Node.js versions are working
+Step 9: Use multiple jobs
+icon of gears indicating relationship between multiple jobs
+
+Let's now try to create a dedicated test job and satisfy the second item in our custom workflow checklist.
+
+This will allow us to separate the build and test functions of our workflow into more than one job that will run when our workflow is triggered.
+
+Activity: Edit your workflow file to separate build and test jobs
+Edit your workflow file
+Create a new job called "test" as follows (we'll use ellipses ... to only show the parts of the workflow we're interested in, but you should not copy the ellipses directly):
+name: Node CI
+
+on: [push]
 
 jobs:
   build:
+    ...
+  test:
+    ...
+In the build job, include the following portions of your existing workflow:
+build:
   runs-on: ubuntu-latest
   steps:
     - uses: actions/checkout@v2
@@ -19,7 +62,7 @@ jobs:
       run: |
         npm install
         npm run build
-
+In the newly created test job, include the following portions of your existing workflow:
 test:
   runs-on: ubuntu-latest
   strategy:
@@ -38,3 +81,41 @@ test:
       npm test
     env:
       CI: true
+If you'd like to copy and paste the full workflow file instead, click here to see it in its entirety.
+name: Node CI
+
+on: [push]
+
+jobs:
+  build:
+
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v2
+      - name: npm install and build webpack
+        run: |
+          npm install
+          npm run build
+
+  test:
+
+    runs-on: ubuntu-latest
+
+    strategy:
+      matrix:
+        os: [ubuntu-latest, windows-2016]
+        node-version: [12.x, 14.x]
+
+    steps:
+    - uses: actions/checkout@v2
+    - name: Use Node.js ${{ matrix.node-version }}
+      uses: actions/setup-node@v1
+      with:
+        node-version: ${{ matrix.node-version }}
+    - name: npm install, and test
+      run: |
+        npm install
+        npm test
+      env:
+        CI: true
